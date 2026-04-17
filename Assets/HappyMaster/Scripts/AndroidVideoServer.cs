@@ -175,8 +175,17 @@ public class AndroidVideoServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            // 客户端主动断开连接(Seek 拖拽进度条时会抛弃旧连接是正常现象)
-            Debug.Log("Stream disconnected: " + e.Message);
+// 过滤掉客户端(播放器)主动断开连接引发的常规异常
+            if (e is System.Net.HttpListenerException || e is System.IO.IOException)
+            {
+                // 这说明是播放器缓存满了或者在拖拽进度条，直接忽略，不打印日志
+                // 注释： Client disconnected cleanly.
+            }
+            else
+            {
+                // 遇到真正的逻辑报错（比如内存溢出、文件被占用）才打印成红色错误
+                Debug.LogError($"[VideoServer] 发生异常: {e.Message}\n{e.StackTrace}");
+            }
         }
         finally
         {
