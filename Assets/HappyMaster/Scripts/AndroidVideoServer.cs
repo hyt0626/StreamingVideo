@@ -24,7 +24,7 @@ public class AndroidVideoServer : MonoBehaviour
     // 缓存解密后的 512 字节文件头
     private byte[] _decryptedHeader = new byte[512];
     private bool _hasDecryptedHeader = false;
-    byte[] buffer = ArrayPool<byte>.Shared.Rent(64 * 1024);
+    byte[] buffer = ArrayPool<byte>.Shared.Rent(1024 * 1024);
 
     void Start()
     {
@@ -173,9 +173,10 @@ public class AndroidVideoServer : MonoBehaviour
                 }
             }
         }
-        catch (Exception)
+        catch (Exception e)
         {
             // 客户端主动断开连接(Seek 拖拽进度条时会抛弃旧连接是正常现象)
+            Debug.Log("Stream disconnected: " + e.Message);
         }
         finally
         {
